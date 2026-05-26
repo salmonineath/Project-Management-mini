@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\Projects\\\\Company-Project\\\\Project1-learning\\\\Project-Management-mini\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(ConvertTo-Json -Depth 100)",
+      "Bash(Get-ChildItem -Path \"D:\\\\Projects\\\\Company-Project\\\\Project1-learning\\\\Project-Management-mini\" -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)"
+    ]
+  }
+}
