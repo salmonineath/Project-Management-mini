@@ -3,7 +3,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Role } from '../../../generated/prisma/client.js';
+import { Role } from '../../../generated/prisma/client';
 
 export { Role };
 
