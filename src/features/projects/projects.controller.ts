@@ -1,9 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Get, Patch, Delete, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Get, Patch, Delete, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { ResponseMessage } from 'src/common';
+import { ResponseMessage } from '../../common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('api/v1/projects')
 export class ProjectsController {
     constructor(private readonly projectService: ProjectsService) {}
@@ -11,14 +14,14 @@ export class ProjectsController {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ResponseMessage('Project create successfully')
-    create(@Body() dto: CreateProjectDto) {
-        return this.projectService.create( 1, dto);
+    create(@CurrentUser() user: { sub: number }, @Body() dto: CreateProjectDto) {
+        return this.projectService.create( user.sub, dto);
     }
 
-    @Get()
-    @ResponseMessage('Get project successfully')
-    findAll() {
-        return this.projectService.findAll();
+    @Get('my-projects')
+    @ResponseMessage('Get my project successfully')
+    findByOwner(@CurrentUser() user: { sub: number } ) {
+        return this.projectService.findByOwner(user.sub);
     }
 
     @Get(':id')
@@ -26,12 +29,6 @@ export class ProjectsController {
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.projectService.findOne(id);
     }
-
-    // @Get(':ownerId')
-    // @ResponseMessage('Get your project successfully')
-    // findByOwner(@Param('ownerId', ParseIntPipe) ownerId: number) {
-    //     return this.projectService.findByOwner(ownerId);
-    // }
 
     @Patch(':id')
     @ResponseMessage('Project updated successfully')
