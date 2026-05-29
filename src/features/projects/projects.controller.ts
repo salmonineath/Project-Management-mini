@@ -33,20 +33,22 @@ export class ProjectsController {
     @Patch(':id')
     @ResponseMessage('Project updated successfully')
     update(
+        @CurrentUser() user: {sub: number},
         @Param('id', ParseIntPipe)
         id: number,
         @Body() dto: UpdateProjectDto,
     ) {
-        return this.projectService.update(id, dto);
+        return this.projectService.update(id, dto, user.sub);
     }
 
     @Delete(':id')
     @ResponseMessage('Deleted project successfully')
     remove(
+        @CurrentUser() user: { sub: number },
         @Param('id', ParseIntPipe)
         id: number
     ) {
-        return this.projectService.remove(id);
+        return this.projectService.remove(id, user.sub);
     }
 }
 
