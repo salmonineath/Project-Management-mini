@@ -4,22 +4,23 @@ WORKDIR /app
 
 # ─── Development ─────────────────────────────────────────────────────────────
 FROM base AS development
-COPY package*.json ./
+COPY package*.json .npmrc ./
 RUN npm ci
 COPY . .
 CMD ["npm", "run", "start:dev"]
 
 # ─── Build ───────────────────────────────────────────────────────────────────
 FROM base AS build
-COPY package*.json ./
+COPY package*.json .npmrc ./
 RUN npm ci
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
 # ─── Production ──────────────────────────────────────────────────────────────
 FROM base AS production
 ENV NODE_ENV=production
-COPY package*.json ./
+COPY package*.json .npmrc ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
 EXPOSE 3000

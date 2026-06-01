@@ -1,98 +1,196 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Project Management (mini)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 📌 Project Description
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is a lightweight project management backend API that lets users create workspaces (projects), manage tasks within them, and collaborate through a clean RESTful interface. Think of it as a simplified Trello clone — minus the frontend.
 
-## Description
+The goal of this project is to demonstrate a solid understanding of the **NestJS framework** through practical implementation: modular architecture, JWT authentication, role-based route protection, data validation, and containerized deployment.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## ✨ Features
 
-```bash
-$ npm install
+### 🔐 Authentication
+- User registration & login
+- Password hashing with **bcrypt**
+- **JWT**-based authentication
+- Protected routes via global `JwtAuthGuard`
+- `@Public()` decorator to opt out of auth on specific routes
+
+### 📁 Projects
+- Create, update, and delete projects
+- Ownership enforcement — only the project creator can modify or delete it
+- List all projects belonging to the authenticated user
+
+### ✅ Tasks
+- Create tasks within a project
+- Assign and update task status (`TODO`, `IN_PROGRESS`, `DONE`)
+- Update and delete tasks
+- Ownership and project membership checks
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [NestJS](https://nestjs.com/) + TypeScript |
+| ORM | [Prisma](https://www.prisma.io/) |
+| Database | MariaDB |
+| Auth | JWT + bcrypt |
+| Containerization | Docker + Docker Compose |
+| Reverse Proxy | Nginx |
+
+---
+
+## 🏗️ Architecture
+
+This project follows a **feature-based modular monolith** architecture — each domain (auth, users, projects, tasks) is fully encapsulated in its own NestJS module with its own controller, service, and DTOs.
+
+```
+src/
+├── features/
+│   ├── auth/             # Register, login, JWT strategy
+│   ├── users/            # User profile
+│   ├── projects/         # Project CRUD
+│   └── tasks/            # Task CRUD + status management
+├── common/               # Shared guards, decorators, filters, pipes
+├── config/               # Environment & app configuration
+├── prisma/               # Prisma schema & migrations
+├── app.module.ts
+└── main.ts
 ```
 
-## Compile and run the project
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/) & Docker Compose
+- Node.js v18+ (for local development without Docker)
+
+### 1. Clone the Repository
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/your-username/taskify-api.git
+cd taskify-api
 ```
 
-## Run tests
+### 2. Configure Environment Variables
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+Edit `.env` with your values:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```env
+# App
+PORT=3000
+NODE_ENV=development
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# Database
+DATABASE_URL="mysql://taskify_user:taskify_pass@db:3306/taskify_db"
+
+# JWT
+JWT_SECRET=your_super_secret_key_here
+JWT_EXPIRES_IN=7d
+```
+
+### 3. Run with Docker Compose
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker compose up --build
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+This spins up:
+- **NestJS API** on port `3000`
+- **MariaDB** on port `3306`
+- **Nginx** reverse proxy on port `80`
 
-## Resources
+### 4. Run Database Migrations
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+docker compose exec app npx prisma migrate deploy
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 5. (Optional) Open Prisma Studio
 
-## Support
+```bash
+docker compose exec app npx prisma studio
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 💻 Local Development (Without Docker)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Install dependencies
+npm install
 
-## License
+# Run migrations
+npx prisma migrate dev
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Start in watch mode
+npm run start:dev
+```
+
+---
+
+---
+
+## 🗄️ Database Schema (Overview)
+
+```
+User
+ ├── id, email, password, name
+ └── projects[]
+
+Project
+ ├── id, title, description, ownerId
+ └── tasks[]
+
+Task
+ ├── id, title, description, status
+ ├── dueDate (optional)
+ ├── projectId
+ └── assignedTo (optional)
+```
+
+---
+
+## 🧪 Running Tests
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+---
+
+## 📦 Project Scripts
+
+| Script | Description |
+|---|---|
+| `npm run start:dev` | Start in development (watch mode) |
+| `npm run start:prod` | Start in production mode |
+| `npm run build` | Compile TypeScript |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run unit tests |
+
+---
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
