@@ -16,9 +16,11 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/users')
+@Throttle({ default: { ttl: 60000, limit: 100 }})
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

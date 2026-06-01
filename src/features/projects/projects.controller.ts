@@ -5,9 +5,11 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/projects')
+@Throttle({ default: { ttl: 60000, limit: 100 }})
 export class ProjectsController {
     constructor(private readonly projectService: ProjectsService) {}
 

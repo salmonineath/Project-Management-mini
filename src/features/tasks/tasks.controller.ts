@@ -5,9 +5,11 @@ import { ResponseMessage } from 'src/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/projects/:projectId/tasks')
+@Throttle({ default: { ttl: 60000, limit: 100 }})
 export class TasksController {
     constructor(private readonly taskService: TasksService) {}
 
