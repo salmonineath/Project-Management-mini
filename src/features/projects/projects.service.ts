@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -13,7 +13,15 @@ export class ProjectsService {
         return this.prisma as unknown as PrismaClient;
     }
 
+    private async verifyOwnerShip(id: number, userId: number) {
+         const project = await this.prismaClient.project.findUnique({ where: { id }});
+        if (!project) throw new NotFoundException(`Project with id ${id} not found.`)
+            if (project.ownerId !== userId) throw new ForbiddenException('You are not the owner of this project');
+        return project;
+    }
+
     async create(ownerId: number, dto: CreateProjectDto) {
+        // await this.verifyOwnerShip(ownerId, userId)
         try {
             const createdProject = await this.prismaClient.project.create({
                 data: {...dto, ownerId}
@@ -41,10 +49,11 @@ export class ProjectsService {
         return this.prismaClient.project.findMany({ where: { ownerId } });
     }
 
-    async update(id: number, dto: UpdateProjectDto) {
+    async update(id: number, dto: UpdateProjectDto, userId: number) {
+        await this.verifyOwnerShip(id, userId)
         try {
             const updatedProject = await this.prismaClient.project.update({
-                where: { id }, data: dto 
+                where: { id }, data: dto
             });
             return updatedProject;
         } catch (error: any) {
@@ -57,7 +66,8 @@ export class ProjectsService {
         }
     }
 
-    async remove(id: number) {
+    async remove(id: number, userId: number) {
+        await this.verifyOwnerShip(id, userId)
         try {
             const removedProject = await this.prismaClient.project.delete({ where: { id } });
             return removedProject;

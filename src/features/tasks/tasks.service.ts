@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaClient, Prisma } from '../../generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -13,7 +13,15 @@ export class TasksService {
         return this.prisma as unknown as PrismaClient;
     }
 
-    async create(projectId: number, dto: CreateTaskDto) {
+    private async verifyOwnerShip(projectId: number, userId: number) {
+        const project = await this.prismaClient.project.findUnique({ where: { id: projectId }});
+        if (!project) throw new NotFoundException(`Project with id ${projectId} not found.`)
+            if (project.ownerId !== userId) throw new ForbiddenException('You are not the owner of this project');
+        return project;
+    }
+
+    async create(userId: number, projectId: number, dto: CreateTaskDto) {
+        await this.verifyOwnerShip(projectId, userId)
         try {
             const createdTask = await this.prismaClient.tasks.create({
                 data: {...dto, projectId}
@@ -28,19 +36,20 @@ export class TasksService {
         const tasks = await this.prismaClient.tasks.findMany({
             orderBy: { createdAt: 'desc'},
             where: { projectId }
-        })
+        });
         return tasks;
     }
 
     async findOne(projectId: number, id: number) {
         const task = await this.prismaClient.tasks.findFirst({
             where: { id, projectId}
-        })
+        });
         if (!task) throw new NotFoundException(`Task with this ${id} not found`)
         return task;
     }
 
-    async update(id: number, dto: UpdateTaskDto) {
+    async update(userId: number, projectId: number, id: number, dto: UpdateTaskDto) {
+        await this.verifyOwnerShip(projectId, userId)
         try {
             const updatedTasks = await this.prismaClient.tasks.update({
                 where: { id }, data: dto
@@ -54,7 +63,8 @@ export class TasksService {
         }
     }
 
-    async remove(id: number) {
+    async remove(userId: number, projectId: number, id: number) {
+        await this.verifyOwnerShip(projectId, userId);
         try {
             const removeTask = await this.prismaClient.tasks.delete({
                 where: { id }

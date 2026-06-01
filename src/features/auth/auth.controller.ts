@@ -3,8 +3,10 @@ import { AuthService } from './auth.service'
 import { ResponseMessage } from '../../common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('api/v1/auth')
+@Throttle({ auth: {ttl: 60000, limit: 5}})
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 

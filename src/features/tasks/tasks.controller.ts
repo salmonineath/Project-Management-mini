@@ -4,17 +4,20 @@ import { TasksService } from './tasks.service';
 import { ResponseMessage } from 'src/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/projects/:projectId/tasks')
+@Throttle({ default: { ttl: 60000, limit: 100 }})
 export class TasksController {
     constructor(private readonly taskService: TasksService) {}
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ResponseMessage('Task created successfully')
-    create(@Param('projectId', ParseIntPipe) projectId: number, @Body() dto: CreateTaskDto) {
-        return this.taskService.create(projectId, dto);
+    create( @CurrentUser() user: { sub: number },@Param('projectId', ParseIntPipe) projectId: number, @Body() dto: CreateTaskDto) {
+        return this.taskService.create(user.sub, projectId, dto);
     }
 
     @Get()
@@ -37,15 +40,19 @@ export class TasksController {
     @Patch(':id')
     @ResponseMessage('Task updated successfully')
     update(
+        @CurrentUser() user: { sub: number },
+        @Param('projectId', ParseIntPipe) projectId: number,
         @Param('id',  ParseIntPipe) id: number,
         @Body() dto: UpdateTaskDto
     ) {
-        return this.taskService.update(id, dto);
+        return this.taskService.update(user.sub, projectId, id, dto);
     }
 
     @Delete(':id')
     @ResponseMessage('Task removed successfully')
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.taskService.remove(id);
+    remove(@CurrentUser() user: { sub: number }, 
+    @Param('projectId', ParseIntPipe) projectId: number, 
+    @Param('id', ParseIntPipe) id: number) {
+        return this.taskService.remove(user.sub, projectId, id);
     }
 }
