@@ -11,7 +11,10 @@
       "Bash(npm install *)",
       "Bash(Get-Content \"D:\\\\Projects\\\\Company-Project\\\\Project1-learning\\\\Project-Management-mini\\\\dist\\\\src\\\\generated\\\\prisma\\\\internal\\\\class.js\")",
       "Bash(Select-String \"exports\")",
-      "Bash(Select-Object -First 5)"
+      "Bash(Select-Object -First 5)",
+      "Bash(node -e ' *)",
+      "Bash(npx prisma *)",
+      "PowerShell(npx prisma db seed)"
     ]
   }
 }

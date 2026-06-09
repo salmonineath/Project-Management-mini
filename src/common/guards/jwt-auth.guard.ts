@@ -26,24 +26,23 @@ export class JwtAuthGuard implements CanActivate {
         const auth = request.headers.authorization;
 
         // Reject requests that are missing the Authorization header or not using the Bearer scheme
-        if (!auth || !auth.startsWith('Bearer')) {
+        if (!auth || !auth.startsWith('Bearer ')) {
             throw new UnauthorizedException();
         }
 
         // Extract the token portion from "Bearer <token>"
         const token = auth.split(' ')[1];
+        if (!token) {
+            throw new UnauthorizedException();
+        }
 
         try {
-            // Verify the token's signature and expiry, returning the decoded payload
             const payload = this.jwtService.verify(token);
 
-            // Attach the decoded payload (e.g. { sub, email }) to the request
-            // so downstream controllers can access it via @Req() or custom decorators
             request.user = payload;
 
             return true;
         } catch {
-            // Token is invalid, expired, or tampered with
             throw new UnauthorizedException();
         }
     }

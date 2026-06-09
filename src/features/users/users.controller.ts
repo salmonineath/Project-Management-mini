@@ -15,10 +15,13 @@ import { UsersService } from './users.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator.js';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { RoleGuard } from '../../common/guards/role.guard.js';
 import { Throttle } from '@nestjs/throttler';
+import { Role } from '../../common/decorators/role.decorator.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RoleGuard)
+@Role("ADMIN")
 @Controller('api/v1/users')
 @Throttle({ default: { ttl: 60000, limit: 100 }})
 export class UsersController {

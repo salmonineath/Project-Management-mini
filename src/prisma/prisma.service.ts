@@ -12,6 +12,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       connectionLimit: 5,
+      ssl: true,
+      // SkySQL serverless auto-pauses when idle; the first connection wakes it,
+      // which can exceed the driver's default ~10s timeout. Give the cold start room.
+      connectTimeout: 30000,
     });
     super({ adapter });
   }
